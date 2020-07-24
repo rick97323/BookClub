@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -11,28 +12,44 @@ namespace PLINQ
     {
         public void Run()
         {
-            ParallelAdvanced();
+            ParallelFind();
         }
 
-        void ParallelAdvanced()
+        //考慮選擇正確算法以提升效率
+        void ParallelFind()
         {
-            var source = Enumerable.Range(0, 100);
+            var comparer = new DelayComparerInt();
+            var target = 888;
+
+            var source = Enumerable.Range(0, 1000).ToArray();
             var sw = Stopwatch.StartNew();
-            var anyTarget = source.Any(FindTarget);
+            Func<int, bool> findTarget = value => comparer.Compare(value, target) == 0;
+
+
+            var index = Array.BinarySearch(source, target, comparer);
             sw.Stop();
-            Console.WriteLine($"普通查詢耗時\t{sw.Elapsed.TotalSeconds:F3}");
+            Console.WriteLine($"BinarySearch 查詢耗時\t{sw.Elapsed.TotalSeconds:F3}");
 
             sw.Restart();
-            anyTarget = source.AsParallel().Any(FindTarget);
+            var anyTarget = source.AsParallel().Any(findTarget);
             sw.Stop();
             Console.WriteLine($"PLinq 查詢耗時\t{sw.Elapsed.TotalSeconds:F3}");
-        }
 
-        bool FindTarget(int value)
+            sw.Restart();
+            anyTarget = source.Any(findTarget);
+            sw.Stop();
+            Console.WriteLine($"普通查詢耗時\t{sw.Elapsed.TotalSeconds:F3}");
+        }
+    }
+
+
+    class DelayComparerInt : IComparer<int>
+    {
+        public int Compare([AllowNull] int x, [AllowNull] int y)
         {
             //模擬耗時運算
-            SpinWait.SpinUntil(() => false, 10);
-            return value == 500;
+            Thread.Sleep(5);
+            return x.CompareTo(y);
         }
     }
 }

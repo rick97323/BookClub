@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace PLINQ
 {
@@ -12,7 +8,7 @@ namespace PLINQ
     {
         static void Main(string[] args)
         {
-            new Plinq_Basis().Run();
+            new Plinq_Basic().Run();
             new Plinq_Advanced().Run();
         }
 
