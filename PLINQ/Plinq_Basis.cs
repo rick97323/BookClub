@@ -7,7 +7,7 @@ using static PLINQ.Program;
 
 namespace PLINQ
 {
-    class Plinq_Basis
+    class Plinq_Basic
     {
         public void Run()
         {
@@ -32,8 +32,9 @@ namespace PLINQ
             ConcurrentQueue<string> printData = new ConcurrentQueue<string>();
             var temp = source.Select(value =>
             {
-                var thread = Thread.CurrentThread.ManagedThreadId;
-                printData.Enqueue($"Take {value,2} With Thread {thread,2}");
+                var thread = Thread.CurrentThread;
+                //運行時會以執行緒池安排工作
+                printData.Enqueue($"Take {value,2} With Thread {thread.ManagedThreadId,2} Pool={thread.IsThreadPoolThread}");
                 return value;
             });
 
